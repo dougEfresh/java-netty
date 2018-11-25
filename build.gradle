@@ -115,7 +115,7 @@ bintray {
       repo = 'maven'
       userOrg = 'dougefresh'
       name = project.name
-      desc = project.description
+      desc = "OpenTracing Tracer that report traces (on logs, metrics,...)"
       websiteUrl = project.website_url
       issueTrackerUrl = project.issue_url
       vcsUrl = project.scm_url

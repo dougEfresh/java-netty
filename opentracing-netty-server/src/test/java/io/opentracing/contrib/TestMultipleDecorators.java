@@ -42,7 +42,7 @@ public class TestMultipleDecorators extends AbstractNettyTest {
     assertEquals("netty-http-server", mockSpan.tags().get(Tags.COMPONENT.getKey()));
     assertEquals("server", mockSpan.tags().get(Tags.SPAN_KIND.getKey()));
     assertEquals("GET", mockSpan.tags().get(Tags.HTTP_METHOD.getKey()));
-    assertEquals("SERVICE", mockSpan.tags().get(Tags.SERVICE.getKey()));
+    assertEquals("SERVICE", mockSpan.tags().get("service"));
     assertEquals("200", mockSpan.tags().get(Tags.DB_USER.getKey()));
   }
 
@@ -59,7 +59,7 @@ public class TestMultipleDecorators extends AbstractNettyTest {
 
     @Override
     public void onResponse(ChannelHandlerContext ctx, HttpResponse response, Span span) {
-      Tags.SERVICE.set(span, "SERVICE");
+      span.setTag("service", "SERVICE");
       throw new IllegalArgumentException("I failed");
     }
   }
