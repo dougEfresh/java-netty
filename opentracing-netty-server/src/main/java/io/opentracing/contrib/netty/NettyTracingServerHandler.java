@@ -67,6 +67,7 @@ public class NettyTracingServerHandler extends ChannelDuplexHandler {
       ctx.fireChannelRead(ctx);
       return;
     }
+    //Already has tracing
     if (ctx.channel().attr(NettyHttpTracing.SPAN_ATTRIBUTE).get() != null) {
       ctx.fireChannelRead(msg);
       return;

@@ -15,8 +15,7 @@ allprojects {
   apply plugin: 'idea'
   //apply plugin: 'license'
   //project.version = "git describe --always --dirty".execute().text.trim()
-  project.version = '0.1.0-SNAPSHOT'
-  version = '0.1.0-SNAPSHOT'
+  version = '0.1.0-RC1'
   println("version : '${project.version}'")
   group = "com.github.dougefresh.opentracing"
   project.ext.description="OpenTracing Tracer that report traces (on logs, metrics,...)"
@@ -28,6 +27,10 @@ allprojects {
   project.ext.license_url="https://www.apache.org/licenses/LICENSE-2.0.txt"
   project.ext.license_year=Calendar.getInstance().get(Calendar.YEAR)
   project.ext.license_owner="The OpenTracing Authors"
+}
+
+String propValue(String propName, String defValue) {
+    (project.hasProperty(propName) && project.getProperty(propName)) ? project.getProperty(propName) : defValue
 }
 
 def pomConfig = {
@@ -153,11 +156,11 @@ bintray {
     repositories {
       maven {
         credentials {
-          username "${maven_user}"
-          password "${maven_password}"
+          username propValue('maven_user', 'unknown')
+          password propValue('maven_password', ' ')
         }
-        def releasesRepoUrl = "${maven_release_repo}"
-        def snapshotsRepoUrl = "${maven_snapshot_repo}"
+        def releasesRepoUrl = propValue('maven_release_repo', '')
+        def snapshotsRepoUrl = propValue('maven_snapshot_repo', '')
         url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
       }
     }
