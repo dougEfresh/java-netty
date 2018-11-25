@@ -1,0 +1,25 @@
+project.ext.description = "Netty Channel Pipeline for OpenTracing"
+
+configurations {
+    provided
+}
+
+sourceSets {
+    main.compileClasspath += configurations.provided
+    test.compileClasspath += configurations.provided
+    test.runtimeClasspath += configurations.provided
+}
+
+
+dependencies {
+  compile "io.opentracing:opentracing-api:${v_opentracing}"
+  compile "io.opentracing:opentracing-util:${v_opentracing}"
+  compile "org.slf4j:slf4j-api:${v_slf4j}"
+  provided "io.netty:netty-all:${v_netty}"
+  provided "org.slf4j:slf4j-simple:${v_slf4j}"
+  testCompile "com.squareup.okhttp3:okhttp:${v_okhttp}"
+  testCompile "org.awaitility:awaitility:${v_awaitility}"
+  testCompile "junit:junit:${v_junit}"
+  testCompile "org.mockito:mockito-all:${v_mockito}"
+  testCompile "io.opentracing:opentracing-mock:${v_opentracing}"
+}

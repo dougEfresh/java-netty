@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <appenders>
+     <console name="stdout" target="SYSTEM_OUT">
+      <patternLayout pattern="%d %-5p [%t] [traceId=%X{traceId} spanId=%X{spanId}] [%C{5}:%L] [$${sys:obTags:-}] - %m%n" />
+     </console>
+  </appenders>
+
+  <loggers>
+	  <logger name="com.outbrain.ob1k.server.netty.HttpRequestDispatcherHandler" level="warn" />
+	  <logger name="com.outbrain.ob1k.http" level="info"/>
+	  <logger name="com.outbrain.scraper.targets" level="info"/>
+	  <logger name="com.outbrain" level="info"/>
+	  <logger name="org.springframework" level="info"/>
+    <logger name="springfox" level="info"/>
+    <logger name="io.swagger" level="info"/>
+    <logger name="com.outbrain.globals.util" level="info"/>
+    <logger name="io.jaegertracing" level="debug"/>
+    <logger name="io.opentracing" level="debug"/>
+	  <logger name="com.outbrain.devx.devstrapping" level="debug"/>
+    <logger name="ob-events" level="error" additivity="false">
+      <appenderRef ref="stdout" />
+    </logger>
+     <logger name="tracer" level="TRACE"/>
+    <root level="info">
+        <appenderRef ref="stdout" />
+    </root>
+  </loggers>
+</configuration>
+

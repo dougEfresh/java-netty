@@ -1,0 +1,168 @@
+plugins {
+  id "com.github.hierynomus.license" version "0.14.0"
+  id "com.jfrog.bintray" version "1.8.4"
+  id "jacoco"
+  id 'com.github.sherter.google-java-format' version '0.6'
+  id "com.github.johnrengelman.shadow" version "2.0.4"
+  id "net.ltgt.errorprone" version "0.0.14"
+  id 'ru.vyarus.animalsniffer' version '1.4.3'
+  id 'io.codearte.nexus-staging' version '0.11.0'
+  id 'com.github.ben-manes.versions' version '0.17.0'
+  id 'maven-publish'
+}
+
+allprojects {
+  apply plugin: 'idea'
+  //apply plugin: 'license'
+  //project.version = "git describe --always --dirty".execute().text.trim()
+  project.version = '0.1.0-SNAPSHOT'
+  version = '0.1.0-SNAPSHOT'
+  println("version : '${project.version}'")
+  group = "com.github.dougefresh.opentracing"
+  project.ext.description="OpenTracing Tracer that report traces (on logs, metrics,...)"
+  project.ext.website_url="https://github.com/dougEfresh/${rootProject.name}"
+  project.ext.issue_url="${project.website_url}/issues"
+  project.ext.scm_github_repo="dougEfresh/${rootProject.name}"
+  project.ext.scm_url="https://github.com/${project.scm_github_repo}"
+  project.ext.license_name="Apache-2.0" // use value of bintray license enum
+  project.ext.license_url="https://www.apache.org/licenses/LICENSE-2.0.txt"
+  project.ext.license_year=Calendar.getInstance().get(Calendar.YEAR)
+  project.ext.license_owner="The OpenTracing Authors"
+}
+
+def pomConfig = {
+  developers {
+    developer {
+      id "dougefresh"
+      name "Douglas Chimento"
+      url "https://github.com/dougEfresh"
+    }
+  }
+  scm {
+    url project.scm_url
+    connection "scm:git:${project.scm_url}.git"
+    developerConnection "scm:git:${project.scm_url}.git"
+  }
+  issueManagement {
+    system "github"
+    url project.issue_url
+  }
+}
+
+subprojects {
+  apply plugin: 'ru.vyarus.animalsniffer'
+  apply plugin: 'java-library'
+  apply plugin: 'maven'
+  apply plugin: 'signing'
+  apply plugin: 'checkstyle'
+  apply plugin: 'maven-publish'
+  apply plugin: 'com.jfrog.bintray'
+
+  repositories {
+    jcenter()
+    mavenLocal()
+  }
+
+  sourceCompatibility = JavaVersion.VERSION_1_8
+  targetCompatibility = JavaVersion.VERSION_1_8
+  [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+  javadoc {
+    failOnError = false
+    options.memberLevel = org.gradle.external.javadoc.JavadocMemberLevel.PROTECTED
+    options.docTitle = "${project.name} ${project.version} Javadoc"
+    options.windowTitle = "${project.name} ${project.version} Javadoc"
+    options.header = "<b>${project.name} ${project.version}</b>"
+    options.author = "true"
+    options.use = "true"
+    //disable doclint for JDK8, more quiet output
+    if (JavaVersion.current().isJava8Compatible()) {
+      options.addStringOption('Xdoclint:none', '-quiet')
+    }
+  }
+
+  task sourcesJar(type: Jar, dependsOn: classes, description: 'Creates a jar from the source files.') {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+  }
+
+  task javadocJar(type: Jar, dependsOn: javadoc, description: 'Creates a jar from the javadoc files.') {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+  }
+
+  checkstyle {
+    configFile = rootProject.file('config/checkstyle/checkstyle.xml')
+    toolVersion = "7.6.1"
+  }
+
+  animalsniffer {
+    sourceSets = [sourceSets.main]
+  }
+  artifacts {
+    archives sourcesJar
+  }
+
+bintray {
+    user = project.hasProperty('bintray_user') ? project.property('bintray_user') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintray_key') ? project.property('bintray_key') : System.getenv('BINTRAY_KEY')
+    publications = ['MyPublication']
+    dryRun = false
+    pkg {
+      repo = 'maven'
+      userOrg = 'dougefresh'
+      name = project.name
+      desc = project.description
+      websiteUrl = project.website_url
+      issueTrackerUrl = project.issue_url
+      vcsUrl = project.scm_url
+      licenses = [project.license_name]
+      labels = ['open-tracing']
+      publicDownloadNumbers = true
+      githubRepo = project.scm_github_repo
+      githubReleaseNotesFile = 'README.md'
+    }
+}
+
+  publishing {
+    publications {
+      MyPublication(MavenPublication) {
+        from components.java
+        artifact sourcesJar
+        artifact javadocJar
+        groupId project.group
+        artifactId project.name
+        version project.version
+        pom.withXml {
+          def root = asNode()
+          root.appendNode('description', project.description)
+          root.appendNode('name', project.name)
+          root.appendNode('url', project.website_url)
+          root.appendNode('inceptionYear', project.license_year)
+          root.children().last() + pomConfig
+          // could not use the pomConfig to set license,
+          // maybe because the  Node license {...} is associated to the license plugin
+          def lic = root.appendNode('licenses').appendNode('license')
+          lic.appendNode('name', project.license_name)
+          lic.appendNode('url', project.license_url)
+          lic.appendNode('distribution', "repo")
+        }
+      }
+    }
+
+    repositories {
+      maven {
+        credentials {
+          username "${maven_user}"
+          password "${maven_password}"
+        }
+        def releasesRepoUrl = "${maven_release_repo}"
+        def snapshotsRepoUrl = "${maven_snapshot_repo}"
+        url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+      }
+    }
+  }
+}
+
+
+
