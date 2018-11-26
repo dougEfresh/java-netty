@@ -1,4 +1,5 @@
-[![Build Status][ci-img]][ci] [![Released Version][maven-img]][maven]
+[![Build Status][ci-img]][ci] [ ![Download](https://api.bintray.com/packages/dougefresh/maven/opentracing-netty-server/images/download.svg?version=0.1.0-RC1) ](https://bintray.com/dougefresh/maven/opentracing-netty-server/0.1.0-RC1/link)
+
 
 # OpenTracing Java Netty Server Instrumentation
 
@@ -26,9 +27,9 @@ Channel ch = b.bind(0).sync().channel();
 port = ((InetSocketAddress) ch.localAddress()).getPort();
 ```
 
-## Tracer Decorators
+## Trace Decorators
 
-TBD
+A default [decorator](https://github.com/dougEfresh/java-netty/blob/master/opentracing-netty-server/src/main/java/io/opentracing/contrib/netty/NettyHttpSpanDecorator.java#L19) is provider. You can add your own by implementing [NettyHttpSpanDecorator](https://github.com/dougEfresh/java-netty/blob/master/opentracing-netty-server/src/main/java/io/opentracing/contrib/netty/NettyHttpSpanDecorator.java#L13)  
 
 ## Accessing Server Span
 Current server span accessible via attr .
@@ -42,11 +43,15 @@ Span span = ctx.channel().attr(NettyHttpTracing.SPAN_ATTRIBUTE).get();
 ./gradlew clean check
 ```
 
+## Special Thanks
+
+* [java-web-servlet-filter](https://github.com/opentracing-contrib/java-web-servlet-filter)
+* [brave netty instrumentation](https://github.com/openzipkin/brave)
+
 ## Release
 Follow instructions in [RELEASE](RELEASE.md)
 
 
    [ci-img]: https://travis-ci.org/dougEfresh/java-netty.svg?branch=master
    [ci]: https://travis-ci.org/dougEfresh/java-netty
-   [maven-img]: https://img.shields.io/maven-central/v/com.github.dougefresh.opentracing/opentracing-netty-server.svg?maxAge=2592000
    [maven]: http://search.maven.org/#search%7Cga%7C1%7Copentracing-netty-server
