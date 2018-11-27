@@ -1,4 +1,4 @@
-[![Build Status][ci-img]][ci] [ ![Download](https://api.bintray.com/packages/dougefresh/maven/opentracing-netty-server/images/download.svg?version=0.1.0-RC1) ](https://bintray.com/dougefresh/maven/opentracing-netty-server/0.1.0-RC1/link)
+[![Build Status][ci-img]][ci] [ ![Download](https://api.bintray.com/packages/dougefresh/maven/opentracing-netty-server/images/download.svg?version=0.1.0-RC1) ](https://bintray.com/dougefresh/maven/opentracing-netty-server/0.1.0-RC1/link) [![OpenTracing Badge](https://img.shields.io/badge/OpenTracing-enabled-blue.svg)](http://opentracing.io)
 
 
 # OpenTracing Java Netty Server Instrumentation
@@ -55,3 +55,4 @@ Follow instructions in [RELEASE](RELEASE.md)
    [ci-img]: https://travis-ci.org/dougEfresh/java-netty.svg?branch=master
    [ci]: https://travis-ci.org/dougEfresh/java-netty
    [maven]: http://search.maven.org/#search%7Cga%7C1%7Copentracing-netty-server
+
