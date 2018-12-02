@@ -22,6 +22,7 @@ install:
 
 script:
   - ./gradlew check
+  - ./gradlew -Pv_netty=4.1.30.Final clean check
 
 after_success:
   - 'echo "TRAVIS_TAG: $TRAVIS_TAG" - "TRAVIS_PULL_REQUEST: $TRAVIS_PULL_REQUEST"'

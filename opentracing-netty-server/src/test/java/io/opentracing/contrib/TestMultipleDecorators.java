@@ -72,7 +72,7 @@ public class TestMultipleDecorators extends AbstractNettyTest {
 
     @Override
     public void onResponse(ChannelHandlerContext ctx, HttpResponse response, Span span) {
-      Tags.DB_USER.set(span, response.status().codeAsText().toString());
+      Tags.DB_USER.set(span, String.valueOf(response.getStatus().code()));
     }
   }
 }

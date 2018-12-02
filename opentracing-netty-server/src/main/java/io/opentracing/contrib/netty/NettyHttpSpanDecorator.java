@@ -20,15 +20,15 @@ public interface NettyHttpSpanDecorator {
     @Override
     public void onRequest(final ChannelHandlerContext ctx, final HttpRequest request, Span span) {
       Tags.COMPONENT.set(span, "netty-http-server");
-      Tags.HTTP_METHOD.set(span, request.method().name());
-      QueryStringDecoder url = new QueryStringDecoder(request.uri());
+      Tags.HTTP_METHOD.set(span, request.getMethod().name());
+      QueryStringDecoder url = new QueryStringDecoder(request.getUri());
       Tags.HTTP_URL.set(span, url.path());
     }
 
     @Override
     public void onResponse(final ChannelHandlerContext ctx, final HttpResponse response, final Span span) {
-      Tags.HTTP_STATUS.set(span, response.status().code());
-      if (response.status().code() >= 500) {
+      Tags.HTTP_STATUS.set(span, response.getStatus().code());
+      if (response.getStatus().code() >= 500) {
         Tags.ERROR.set(span, true);
       }
     }

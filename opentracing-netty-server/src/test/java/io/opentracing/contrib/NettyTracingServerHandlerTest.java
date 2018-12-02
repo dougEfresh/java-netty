@@ -26,11 +26,11 @@ public class NettyTracingServerHandlerTest {
                                                                       singletonList(STANDARD_TAGS),
                                                                       Pattern.compile("/health"));
     HttpRequest request = Mockito.mock(HttpRequest.class);
-    when(request.uri()).thenReturn("/health");
+    when(request.getUri()).thenReturn("/health");
     assertFalse(handler.isTraced(Mockito.mock(ChannelHandlerContext.class), request));
 
     reset(request);
-    when(request.uri()).thenReturn("/api/users");
+    when(request.getUri()).thenReturn("/api/users");
     assertTrue(handler.isTraced(Mockito.mock(ChannelHandlerContext.class), request));
   }
 }

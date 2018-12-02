@@ -1,11 +1,12 @@
 package io.opentracing.contrib.netty;
 
+import static io.netty.handler.codec.http.HttpHeaders.is100ContinueExpected;
+
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
-import io.netty.handler.codec.http.HttpUtil;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.Tracer;
@@ -63,7 +64,7 @@ public class NettyTracingServerHandler extends ChannelDuplexHandler {
       ctx.fireChannelRead(msg);
       return;
     }
-    if (HttpUtil.is100ContinueExpected(request)) {
+    if (is100ContinueExpected(request)) {
       ctx.fireChannelRead(ctx);
       return;
     }
@@ -74,7 +75,7 @@ public class NettyTracingServerHandler extends ChannelDuplexHandler {
     }
     SpanContext extractedContext = tracer.extract(Format.Builtin.HTTP_HEADERS,
                                                   new HttpNettyRequestExtractAdapter(request));
-    final Span span = tracer.buildSpan(request.method().name())
+    final Span span = tracer.buildSpan(request.getMethod().name())
                               .asChildOf(extractedContext)
                               .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER).start();
     ctx.channel().attr(NettyHttpTracing.SPAN_ATTRIBUTE).set(span);
@@ -126,7 +127,7 @@ public class NettyTracingServerHandler extends ChannelDuplexHandler {
   @SuppressWarnings("unused")
   public boolean isTraced(ChannelHandlerContext ctx, HttpRequest request) {
     if (skipPattern != null) {
-      return !skipPattern.matcher(request.uri()).matches();
+      return !skipPattern.matcher(request.getUri()).matches();
     }
     return true;
   }

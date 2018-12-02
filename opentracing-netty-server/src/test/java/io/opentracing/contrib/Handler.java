@@ -1,6 +1,11 @@
 package io.opentracing.contrib;
 
-import static io.netty.handler.codec.http.HttpHeaderNames.CONNECTION;
+import static io.netty.handler.codec.http.HttpHeaders.Names.CONNECTION;
+import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
+import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
+import static io.netty.handler.codec.http.HttpHeaders.Values.KEEP_ALIVE;
+import static io.netty.handler.codec.http.HttpHeaders.is100ContinueExpected;
+import static io.netty.handler.codec.http.HttpHeaders.isKeepAlive;
 import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
 import static io.netty.handler.codec.http.HttpResponseStatus.CONTINUE;
 import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
@@ -15,12 +20,9 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpUtil;
 import java.io.IOException;
 
 class Handler extends ChannelInboundHandlerAdapter {
@@ -33,14 +35,14 @@ class Handler extends ChannelInboundHandlerAdapter {
   public void channelRead(ChannelHandlerContext ctx, Object msg) throws IOException {
     if (msg instanceof HttpRequest) {
       req = (HttpRequest) msg;
-      String path = req.uri();
+      String path = req.getUri();
       int queryIndex = path.indexOf('?');
       if (queryIndex != -1) {
         path = path.substring(0, queryIndex);
       }
       String content = null;
       HttpResponseStatus status = OK;
-      if (path.equals("/") && req.method().equals(HttpMethod.OPTIONS)) {
+      if (path.equals("/") && req.getMethod().equals(HttpMethod.OPTIONS)) {
         content = null;
       } else if (path.equals("/foo")) {
         content = "bar";
@@ -70,25 +72,25 @@ class Handler extends ChannelInboundHandlerAdapter {
   }
 
   void writeResponse(ChannelHandlerContext ctx, HttpResponseStatus responseStatus, String content) {
-    if (HttpUtil.is100ContinueExpected(req)) {
+    if (is100ContinueExpected(req)) {
       ctx.write(new DefaultFullHttpResponse(HTTP_1_1, CONTINUE));
     }
-    boolean keepAlive = HttpUtil.isKeepAlive(req);
+    boolean keepAlive = isKeepAlive(req);
     FullHttpResponse response;
     if (content != null) {
       response = new DefaultFullHttpResponse(HTTP_1_1, OK, Unpooled.copiedBuffer(content, UTF_8));
-      response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain");
-      response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
+      response.headers().set(CONTENT_TYPE, "text/plain");
+      response.headers().set(CONTENT_LENGTH, response.content().readableBytes());
     } else {
       response = new DefaultFullHttpResponse(HTTP_1_1, OK);
-      response.headers().set(HttpHeaderNames.CONTENT_LENGTH, 0);
+      response.headers().set(CONTENT_LENGTH, 0);
     }
     response.setStatus(responseStatus);
 
     if (!keepAlive) {
       ctx.write(response).addListener(ChannelFutureListener.CLOSE);
     } else {
-      response.headers().set(CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+      response.headers().set(CONNECTION, KEEP_ALIVE);
       ctx.write(response);
     }
   }
