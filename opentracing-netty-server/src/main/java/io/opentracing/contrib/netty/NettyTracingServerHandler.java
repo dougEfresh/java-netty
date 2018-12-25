@@ -101,7 +101,7 @@ public class NettyTracingServerHandler extends ChannelDuplexHandler {
 
   @Override
   public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise prm) {
-    Span span = ctx.channel().attr(NettyHttpTracing.SPAN_ATTRIBUTE).get();
+    Span span = ctx.channel().attr(NettyHttpTracing.SPAN_ATTRIBUTE).getAndSet(null);
     if (span == null || !(msg instanceof HttpResponse)) {
       ctx.write(msg, prm);
       return;
